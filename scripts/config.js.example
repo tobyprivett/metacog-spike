@@ -1,0 +1,2 @@
+var APPLICATION_ID = 'foo'; // Api credentials: Application keys
+var PUBLISHER_ID = 'bar'; // Api credentials: Application ID
