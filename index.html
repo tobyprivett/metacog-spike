@@ -6,9 +6,68 @@
   <script type="text/javascript" src="scripts/instrumentation.js"></script>
 </head>
 <body>
-<script>
-Metacog.TrainingToolbar.init(true);
-Metacog.Logger.start();
+  <div><a href='#' id='increase'>Increase counter</a></div>
+  <div><a href='#' id='decrease'>Decrease counter</a></div>
+  <div id="counter"></div>
+
+  <script>
+  Metacog.TrainingToolbar.init(true);
+  Metacog.Logger.start();
+
+  var counter;
+  /**
+  * implement the logic of the widget
+  */
+  function setCounter(val){
+    counter = val;
+    document.getElementById("counter").innerHTML = counter;
+  }
+
+  var listener = {};
+  listener.my_init = function(data){
+    console.log("my_init: "+ data.val);
+    setCounter(data.val);
+  }
+
+  /**
+  * this method will fire either from UI or from the metacog API while in playback mode.
+  * your implementation should be agnostic of the real source of the event.
+  */
+  listener.increase = function(data){
+          setCounter(counter + data.step);
+  }
+
+  listener.decrease = function(data){
+          setCounter(counter - data.step);
+  }
+
+  /*
+  * on UI event, don't affect the model directly: just send the event through the router
+  */
+  document.getElementById("increase").addEventListener('click', function(){
+          Metacog.Router.sendEvent({
+                  event: "increase",
+                  data:{step: 1},
+                  type: Metacog.EVENT_TYPE.MODEL
+          });
+  });
+
+  document.getElementById("decrease").addEventListener('click', function(){
+          Metacog.Router.sendEvent({
+                  event: "decrease",
+                  data:{step: 1},
+                  type: Metacog.EVENT_TYPE.MODEL
+          });
+  });
+
+  Metacog.Router.init(listener);
+
+  Metacog.Router.sendEvent({
+          event: "my_init",
+          data: {val: 0},
+          type: Metacog.EVENT_TYPE.MODEL
+  });
+
 </script>
 </body>
 </html>
